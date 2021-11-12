@@ -6,6 +6,6 @@ exampleServerInstance.set_nickname("Fighters")
 
 while True:
 
-		msg = exampleServerInstance.get_mensage()
-		if msg != None:
-			print msg
+    msg = exampleServerInstance.get_mensage()
+    if msg != None:
+        print msg
