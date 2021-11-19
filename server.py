@@ -1,39 +1,20 @@
-import rpyc
-from rpyc.utils.server import ThreadedServer
+from xmlrpc.server import SimpleXMLRPCServer
 
+chat = ''
 
-class P2P(rpyc.Service):
-    known_hosts = []
+class ChatService:     
+    def send_message(self, nickname, msg):
+        global chat
+        chat = nickname + ': ' + msg
 
-    def __init__(self):
-        self.known_hosts = [9000, 9001, 9002]
+    def get_message(self):
+        global chat
+        return chat
 
-    def get_hosts(self):
-        return self.known_hosts
-
-    def update_hosts(self):
-        temp_hosts = []
-        for host in self.known_hosts:
-            try:
-                temp_hosts.append(rpyc.connect(
-                    "localhost", host).root.get_hosts())
-            except:
-                pass
-        self.known_hosts = self.known_hosts.append(temp_hosts)
-
-    def exposed_set_nickname(self, nickname):
-         self.nickname = nickname
-
-    def exposed_echo(self, message):
-         print(message)
-
-    def exposed_set_mensage(self, msg):
-         global chat
-         chat = self.nickname + ": " + msg
-         print(chat)
-    
-
-if __name__ == "__main__":
-    port = input("Port: ")
-    server = ThreadedServer(P2P, hostname="127.0.0.1", port=port)
-    server.start()
+if __name__ == '__main__':
+    try:
+        server = SimpleXMLRPCServer(("localhost", 7700),  allow_none=True)
+        server.register_instance(ChatService())
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print('Exiting')

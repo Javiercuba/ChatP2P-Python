@@ -1,11 +1,9 @@
-import rpyc
+import xmlrpc.client
 
-connection = rpyc.connect("localhost", 18830)
-exampleServerInstance = connection.root
-exampleServerInstance.set_nickname("Fighters")
+s = xmlrpc.client.ServerProxy('http://localhost:7700')
 
+last_msg = ''
 while True:
-
-    msg = exampleServerInstance.get_mensage()
-    if msg != None:
-        print (msg)
+  if last_msg != s.get_message():
+      print(s.get_message())
+      last_msg = s.get_message()

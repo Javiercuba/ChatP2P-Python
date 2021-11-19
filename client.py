@@ -1,26 +1,11 @@
-import rpyc
-from rpyc.utils.server import ThreadedServer
+import xmlrpc.client
 
+s = xmlrpc.client.ServerProxy('http://localhost:7700')
 
-class Client(rpyc.Service):
+nickname = input('Nickname: ')
 
-    def __init__(self,port):
-        self.server = self.start_server(port)
-
-    def start_server(self,port):
-        server = ThreadedServer(Client, hostname="127.0.0.1", port=port)
-        #server.start()
-        return server
-
-
-
-if __name__ == "__main__":
-    port = input("Escolha uma porta")
-    client = Client(port)
-    c = rpyc.connect("localhost", port)
-    nickname = input("Insira seu nickname: ")
-    c.root.set_nickname(str(nickname))
-    while True:
-        msg = input("#")
-        c.root.set_mensage(str(msg))
-        client.start()
+while True:
+  msg = input('> ')
+  if msg == 'sair':
+    break
+  s.send_message(nickname, msg)
