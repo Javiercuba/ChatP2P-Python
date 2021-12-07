@@ -2,7 +2,6 @@ from xmlrpc.server import SimpleXMLRPCServer
 import xmlrpc.client
 from threading import Thread
 
-
 class MessageService:
     def __init__(self, nickname):
         self.nickname = nickname
@@ -29,6 +28,15 @@ class Peer:
         print('Servidor de {} iniciado em {}:{}'.format(
             self.nickname, self.address, self.port))
 
+    def my_peers(self):
+        return self.known_peers
+
+    def send_message(self, index_of_peer, msg):
+        receiver = self.known_peers[index_of_peer]
+        connection = xmlrpc.client.ServerProxy(
+            'http://{}:{}'.format(receiver.address, receiver.port))
+        connection.send_message(self.nickname, msg)
+
     def connect_to_peer(self, new_peer):
         if new_peer not in self.my_peers():    # se o peer não estiver na minha lista...
             self.known_peers.append(new_peer)  # adicione-o
@@ -39,16 +47,6 @@ class Peer:
             for other_peer in self.my_peers():
                 if other_peer not in new_peer.my_peers() and other_peer is not new_peer:
                     new_peer.connect_to_peer(other_peer)
-
-
-    def my_peers(self):
-        return self.known_peers
-
-    def send_message(self, index_of_peer, msg):
-        receiver = self.known_peers[index_of_peer]
-        connection = xmlrpc.client.ServerProxy(
-            'http://{}:{}'.format(receiver.address, receiver.port))
-        connection.send_message(self.nickname, msg)
 
 
 if __name__ == '__main__':
